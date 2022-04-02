@@ -27,7 +27,7 @@ class RRT:
         self.goal = Node(goal[0], goal[1])    # goal node
         self.vertices = []                    # list of nodes
         self.found = False                    # found flag
-        
+        self.c_min = self.dis(self.start,self.goal) # Distance between start and goal
 
     def init_map(self):
         '''Intialize the map before each search
