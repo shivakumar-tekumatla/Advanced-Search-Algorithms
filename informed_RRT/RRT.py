@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import spatial
 
-
 # Class for each tree node
 class Node:
     def __init__(self, row, col):
@@ -28,7 +27,9 @@ class RRT:
         self.vertices = []                    # list of nodes
         self.found = False                    # found flag
         self.c_min = self.dis(self.start,self.goal) # Distance between start and goal
-
+        self.x_center = Node(0.5*(self.start.row+self.goal.row),0.5*(self.start.col+self.goal.col))
+        self.slope_start_goal = self.slope(self.start,self.goal) #slope angle of start and goal line
+        self.rotation_matrix = self.rotation(self.slope_start_goal)  #rotation matrix
     def init_map(self):
         '''Intialize the map before each search
         '''
@@ -85,8 +86,17 @@ class RRT:
         else:
             point = [np.random.randint(0, self.size_row-1), np.random.randint(0, self.size_col-1)]
         return point
-
+    def slope(self,p1, p2):
+        x1,y1 = p1.row,p1.col
+        x2,y2 = p2.row,p2.col
+        if x2-x1 ==0:
+            return np.pi/2
+        return np.arctan2((y2-y1),(x2-x1))
     
+    def rotation(self,theta):
+        rot_matrix = np.array([[np.cos(theta), -np.sin(theta)],
+                [np.sin(theta), np.cos(theta)]])
+        return rot_matrix
     def get_new_point_in_ellipsoid(self, goal_bias, c_best):
         '''Choose the goal or generate a random point in an ellipsoid
            defined by start, goal and current best length of path
@@ -104,7 +114,7 @@ class RRT:
         #### TODO ####
         # Generate a random point in an ellipsoid
         else:
-            pass
+            # pass
             # Compute the distance between start and goal - c_min
 
             # Calculate center of the ellipsoid - x_center
@@ -116,6 +126,14 @@ class RRT:
             # Cast a sample from a unit ball - x_ball
             
             # Map ball sample to the ellipsoid - x_rand
+
+            radiusX = c_best/2
+            radiusY = 0.5*np.sqrt(c_best**2-self.c_min**2)
+            radius = radiusX * np.sqrt(np.random.random()) #generating random radius
+            angle= 2 * np.pi * np.random.random() #Generating random angle 
+            point = [radius * np.cos(angle),radiusY / radiusX *  radius * np.sin(angle)]
+            point = np.dot(self.rotation_matrix,point) #Rotating the point 
+            point = [point[0]+self.x_center.row,point[1]+self.x_center.col] 
 
         #### TODO END ####
 
@@ -152,17 +170,19 @@ class RRT:
 
         #### TODO ####
 
-        new_point = self.get_new_point(goal_bias) #del this
+        # new_point = self.get_new_point(goal_bias) #del this
 
         # Regular sampling if c_best <= 0
         # using self.get_new_point
         
         # Sampling in an ellipsoid if c_best is a positive value
         # using self.get_new_point_in_ellipsoid
-        
+        if c_best <=0:
+            return self.get_new_point(goal_bias)
+        return self.get_new_point_in_ellipsoid(goal_bias, c_best)
         #### TODO END ####
 
-        return new_point
+        # return new_point
 
 
     def extend(self, new_point, extend_dis=10):
@@ -401,7 +421,10 @@ class RRT:
         for i in range(n_pts):
 
             #### TODO ####
-            c_best = 0
+            if self.found:
+                c_best = self.path_cost(self.start, self.goal)
+            else:
+                c_best = 0
             # Once a path is found, update the best length of path - c_best
             # using the function self.path_cost(self.start, self.goal)
 
