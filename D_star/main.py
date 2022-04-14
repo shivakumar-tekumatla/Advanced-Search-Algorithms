@@ -27,10 +27,10 @@ def load_map(file_path):
 
 if __name__ == "__main__":
     # Load the map
-    grid, start, goal = load_map('map1.csv')
-    dynamic_grid, _, _ = load_map('dynamic_map1.csv')
-    # grid, start, goal = load_map('map2.csv')
-    # dynamic_grid, _, _ = load_map('dynamic_map2.csv')
+    # grid, start, goal = load_map('map1.csv')
+    # dynamic_grid, _, _ = load_map('dynamic_map1.csv')
+    grid, start, goal = load_map('map2.csv')
+    dynamic_grid, _, _ = load_map('dynamic_map2.csv')
     # grid, start, goal = load_map('map3.csv')
     # dynamic_grid, _, _ = load_map('dynamic_map3.csv')
 
