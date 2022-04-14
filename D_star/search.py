@@ -136,8 +136,6 @@ class DStar:
         '''
         #### TODO ####
         process_node = self.min_node()# Pop node from open list
-        
-
         process_neighbors =self.get_neighbors(process_node) # Get neighbors of the node
         k_old = self.get_k_min()
         self.delete(process_node)
@@ -151,6 +149,7 @@ class DStar:
                 if neighbor.h <= k_old and process_node.h>neighbor.h+self.cost(process_node,neighbor):
                     process_node.h = neighbor.h+self.cost(process_node,neighbor)
                     process_node.parent = neighbor
+                
         if k_old == process_node.h:
             for neighbor in process_neighbors:
                 if neighbor.tag =="NEW" or neighbor.parent == process_node and neighbor.h!=process_node.h+self.cost(process_node,neighbor) or neighbor.parent != process_node and neighbor.h>process_node.h+self.cost(process_node,neighbor):
@@ -219,7 +218,7 @@ class DStar:
         for neighbor in self.get_neighbors(node):
             if neighbor.is_dy_obs == True and neighbor.is_obs == False:# If neighbor.is_dy_obs == True but neighbor.is_obs == Flase, 
             # the neighbor is a new dynamic obstacle
-                neighbor.is_obs = True 
+                # neighbor.is_obs = True 
                 for neighbor_neighbors in self.get_neighbors(neighbor):
                     self.modify_cost(neighbor,neighbor_neighbors)
                 # Modify the cost from this neighbor node to all this neighbor's neighbors
@@ -265,11 +264,11 @@ class DStar:
 
             # Process until open set is empty or start is reached
             # using self.process_state()
-        curr_node = self.start
+        cur_node = self.start
 
         while True:
             min_k = self.process_state()
-            if min_k == -1 or curr_node.tag == "CLOSED":
+            if min_k == -1 or cur_node.tag == "CLOSED":
                 break
         
         # Visualize the first path if found
@@ -292,17 +291,17 @@ class DStar:
             
             # Uncomment this part when you have finished the previous part
             # for visualizing each move and replanning
-        while curr_node != self.goal :
-            self.prepare_repair(curr_node)
-            self.repair_replan(curr_node)
-            self.get_backpointer_list(curr_node)
+        while cur_node != self.goal :
+            self.prepare_repair(cur_node)
+            self.repair_replan(cur_node)
+            self.get_backpointer_list(cur_node)
             # Visualize the path in progress
             self.draw_path(self.dynamic_grid, "Path in progress")
             # print(self.path)
             if self.path == []:
                 print("No path is found")
                 return
-            curr_node = curr_node.parent 
+            cur_node = cur_node.parent 
             # Get the next node to continue
 
         #### TODO END ####
